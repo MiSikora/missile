@@ -1,0 +1,17 @@
+# Files and directories created by pub
+.dart_tool/
+.packages
+pubspec.lock
+
+# Conventional directory for build outputs
+build/
+
+# Directory created by dartdoc
+doc/api/
+
+# IDEA
+*.iml
+.idea/
+
+# OSX
+.DS_Store
