@@ -144,20 +144,20 @@ void main() {
 
   group('Effect', () {
     test('fx computes the value if all bounded are right', () {
-      final sum = Either.fx<String, int>((binder) {
-        final one = binder.bind(Either<String, int>.right(1));
-        final two = binder.bind(Either<String, int>.right(2));
-        final three = binder.bind(Either<String, int>.right(3));
+      final sum = Either.fx<String, int>((effects) {
+        final one = Either<String, int>.right(1).bind(effects);
+        final two = Either<String, int>.right(2).bind(effects);
+        final three = Either<String, int>.right(3).bind(effects);
         return one + two + three;
       });
       expect(sum, Either<String, int>.right(6));
     });
 
     test('fx stops computation if any of the bounded values is left', () {
-      final sum = Either.fx<String, int>((binder) {
-        final one = binder.bind(Either<String, int>.right(1));
-        final two = binder.bind(Either<String, int>.left('hello'));
-        final three = binder.bind(Either<String, int>.right(3));
+      final sum = Either.fx<String, int>((effects) {
+        final one = Either<String, int>.right(1).bind(effects);
+        final two = Either<String, int>.left('hello').bind(effects);
+        final three = Either<String, int>.right(3).bind(effects);
         return one + two + three;
       });
       expect(sum, Either<String, int>.left('hello'));
@@ -165,10 +165,10 @@ void main() {
 
     test('fx rethrows exception', () {
       expect(
-        () => Either.fx<String, int>((binder) {
-          final one = binder.bind(Either<String, int>.right(1));
+        () => Either.fx<String, int>((effects) {
+          final one = Either<String, int>.right(1).bind(effects);
           final two = Either<String, int>.left('hello').getOrException(() => Exception());
-          final three = binder.bind(Either<String, int>.right(3));
+          final three = Either<String, int>.right(3).bind(effects);
           return one + two + three;
         }),
         throwsException,
@@ -177,10 +177,10 @@ void main() {
 
     test('fx rethrows error', () {
       expect(
-        () => Either.fx<String, int>((binder) {
-          final one = binder.bind(Either<String, int>.right(1));
+        () => Either.fx<String, int>((effects) {
+          final one = Either<String, int>.right(1).bind(effects);
           final two = Either<String, int>.left('hello').getOrError(() => Error());
-          final three = binder.bind(Either<String, int>.right(3));
+          final three = Either<String, int>.right(3).bind(effects);
           return one + two + three;
         }),
         throwsError,

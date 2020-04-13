@@ -28,20 +28,20 @@ void main() {
 
   group('Effect', () {
     test('fx computes the value if all bounded values exist', () {
-      final sum = Option.fx((binder) {
-        final one = binder.bind(Option.some(1));
-        final two = binder.bind(Option.some(2));
-        final three = binder.bind(Option.some(3));
+      final sum = Option.fx((effects) {
+        final one = Option.some(1).bind(effects);
+        final two = Option.some(2).bind(effects);
+        final three = Option.some(3).bind(effects);
         return one + two + three;
       });
       expect(sum, Option.some(6));
     });
 
     test('fx stops computation if any of the bounded values does not exist', () {
-      final sum = Option.fx((binder) {
-        final one = binder.bind(Option.some(1));
-        final two = binder.bind(const Option<int>.none());
-        final three = binder.bind(Option.some(3));
+      final sum = Option.fx((effects) {
+        final one = Option.some(1).bind(effects);
+        final two = const Option<int>.none().bind(effects);
+        final three = Option.some(3).bind(effects);
         return one + two + three;
       });
       expect(sum, const Option<int>.none());
@@ -49,10 +49,10 @@ void main() {
 
     test('fx rethrows exception', () {
       expect(
-        () => Option.fx((binder) {
-          final one = binder.bind(Option.some(1));
+        () => Option.fx((effects) {
+          final one = Option.some(1).bind(effects);
           final two = const Option<int>.none().getOrException(() => Exception());
-          final three = binder.bind(Option.some(3));
+          final three = Option.some(3).bind(effects);
           return one + two + three;
         }),
         throwsException,
@@ -61,10 +61,10 @@ void main() {
 
     test('fx rethrows error', () {
       expect(
-        () => Option.fx((binder) {
-          final one = binder.bind(Option.some(1));
+        () => Option.fx((effects) {
+          final one = Option.some(1).bind(effects);
           final two = const Option<int>.none().getOrError(() => Error());
-          final three = binder.bind(Option.some(3));
+          final three = Option.some(3).bind(effects);
           return one + two + three;
         }),
         throwsError,

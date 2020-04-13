@@ -30,18 +30,18 @@ abstract class Option<T> {
   ///
   /// ```dart
   /// // Results in an option with a value.
-  /// final sum = Option.fx((binder) {
-  ///   final int one = binder.bind(Option.some(1));
-  ///   final int two = binder.bind(Option.some(2));
-  ///   final int three = binder.bind(Option.some(3));
+  /// final sum = Option.fx((effects) {
+  ///   final int one = Option.some(1).bind(effects);
+  ///   final int two = Option.some(2).bind(effects);
+  ///   final int three = Option.some(3).bind(effects);
   ///   return one + two + three;
   /// });
   ///
   /// // Results in an option without a value.
-  /// final sum = Option.fx((binder) {
-  ///   final int one = binder.bind(Option.some(1));
-  ///   final int two = binder.bind(Option.none());
-  ///   final int three = binder.bind(Option.some(3));
+  /// final sum = Option.fx((effects) {
+  ///   final int one = Option.some(1).bind(effects);
+  ///   final int two = Option.none().bind(effects);
+  ///   final int three = Option.some(3).bind(effects);
   ///   return one + two + three;
   /// });
   /// ```
@@ -134,6 +134,11 @@ abstract class Option<T> {
   Either<L, T> toEither<L>(L ifNone) {
     return _isEmpty ? Either<L, T>.left(ifNone) : Either<L, T>.right(_get());
   }
+
+  /// Binds value of this [Option]. If no value is present [effects] control flow is interrupted.
+  T bind(OptionFx effects) {
+    return effects._bind(this);
+  }
 }
 
 @immutable
@@ -185,9 +190,8 @@ class _None<T> extends Option<T> {
 class OptionFx {
   const OptionFx._instance();
 
-  /// Extracts a value of the [option] or cancels computation in the effect scope.
   @nonVirtual
-  T bind<T>(Option<T> option) {
+  T _bind<T>(Option<T> option) {
     return option.getOrException(() => const _NoOptionValueException());
   }
 }

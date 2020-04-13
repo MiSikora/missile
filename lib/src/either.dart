@@ -61,18 +61,18 @@ abstract class Either<L, R> {
   ///
   /// ```dart
   /// // Results in an either with a right value of '6'.
-  /// final sum = Either.fx((binder) {
-  ///   final int one = binder.bind(Either.right(1));
-  ///   final int two = binder.bind(Either.right(2));
-  ///   final int three = binder.bind(Either.right(3));
+  /// final sum = Either.fx((effects) {
+  ///   final int one = Either.right(1).bind(effects);
+  ///   final int two = Either.right(2).bind(effects);
+  ///   final int three = Either.right(3).bind(effects);
   ///   return one + two + three;
   /// });
   ///
   /// // Results in an either with a left value of 'false'.
-  /// final sum = Either.fx((binder) {
-  ///   final int one = binder.bind(Either.right(1));
-  ///   final int two = binder.bind(Either.left(false));
-  ///   final int three = binder.bind(Either.right(3));
+  /// final sum = Either.fx((effects) {
+  ///   final int one = Either.right(1).bind(effects);
+  ///   final int two = Either.left(false).bind(effects);
+  ///   final int three = Either.right(3).bind(effects);
   ///   return one + two + three;
   /// });
   /// ```
@@ -232,6 +232,11 @@ abstract class Either<L, R> {
   Option<R> toOption() {
     return _isLeft ? Option<R>.none() : Option<R>.some(_get());
   }
+
+  /// Binds a right value of this [Either]. If no right value is present [effects] control flow is interrupted.
+  R bind(EitherFx effects) {
+    return effects._bind(this);
+  }
 }
 
 @immutable
@@ -293,9 +298,8 @@ class _Left<L, R> extends Either<L, R> {
 class EitherFx<L> {
   const EitherFx._instance();
 
-  /// Extracts a right value of the [either] or cancels computation in the effect scope.
   @nonVirtual
-  R bind<R>(Either<L, R> either) {
+  R _bind<R>(Either<L, R> either) {
     return either.fold(
       ifLeft: (left) => throw _NoRightValueException(left),
       ifRight: (right) => right,
