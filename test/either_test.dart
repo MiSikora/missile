@@ -277,6 +277,11 @@ void main() {
   group('Right', () {
     final either = Either<String, int>.right(1);
 
+    test('is right', () {
+      expect(either.isLeft, false);
+      expect(either.isRight, true);
+    });
+
     test('does not return alternative provided value', () {
       expect(either.getOrElseProvide(() => 2), 1);
     });
@@ -390,6 +395,11 @@ void main() {
 
   group('Left', () {
     final either = Either<int, String>.left(1);
+
+    test('is left', () {
+      expect(either.isLeft, true);
+      expect(either.isRight, false);
+    });
 
     test('returns alternative provided value', () {
       expect(either.getOrElseProvide(() => '2'), '2');

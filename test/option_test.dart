@@ -161,6 +161,11 @@ void main() {
   group('Some', () {
     final option = Option.some(1);
 
+    test('is not empty', () {
+      expect(option.isEmpty, false);
+      expect(option.isNotEmpty, true);
+    });
+
     test('does not return alternative provided value', () {
       expect(option.getOrElseProvide(() => 2), 1);
     });
@@ -228,6 +233,11 @@ void main() {
 
   group('None', () {
     const option = Option<int>.none();
+
+    test('is empty', () {
+      expect(option.isEmpty, true);
+      expect(option.isNotEmpty, false);
+    });
 
     test('returns alternative provided value', () {
       expect(option.getOrElseProvide(() => 2), 2);

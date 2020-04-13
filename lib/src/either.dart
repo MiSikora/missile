@@ -118,16 +118,20 @@ abstract class Either<L, R> {
     }
   }
 
-  bool get _isLeft;
-
   R _get();
 
   L _getLeft();
 
+  /// Returns `true` if this [Either] does not hold a right value, `false` otherwise.
+  bool get isLeft;
+
+  /// Returns `true` if this [Either] does hold a right value, `false` otherwise.
+  bool get isRight => !isLeft;
+
   /// Returns a right value held by this [Either] or returns a value provided by the [provider].
   @nonVirtual
   R getOrElseProvide(R Function() provider) {
-    return _isLeft ? provider() : _get();
+    return isLeft ? provider() : _get();
   }
 
   /// Returns a right value held by this [Either] or returns [other] value.
@@ -137,19 +141,19 @@ abstract class Either<L, R> {
   /// Returns a right value held by this [Either] or throws an [Exception] from the [provider].
   @nonVirtual
   R getOrException(Exception Function() provider) {
-    return _isLeft ? throw provider() : _get();
+    return isLeft ? throw provider() : _get();
   }
 
   /// Returns a right value held by this [Either] or throws an [Error] from the [provider].
   @nonVirtual
   R getOrError(Error Function() provider) {
-    return _isLeft ? throw provider() : _get();
+    return isLeft ? throw provider() : _get();
   }
 
   /// Returns an [Error] provided by the [provider] if there is no right value.
   @nonVirtual
   Either<L, R> orElseProvide(Either<L, R> Function() provider) {
-    return _isLeft ? provider() : this;
+    return isLeft ? provider() : this;
   }
 
   /// Returns the [other] if there is no right  value.
@@ -161,7 +165,7 @@ abstract class Either<L, R> {
   /// If it is already left sided it returns self.
   @nonVirtual
   Either<L, R> filterOrElseProvide({bool Function(R) predicate, L Function() orElse}) {
-    return _isLeft || predicate(_get()) ? this : Either<L, R>.left(orElse());
+    return isLeft || predicate(_get()) ? this : Either<L, R>.left(orElse());
   }
 
   /// Returns a right sided [Either] if the right value matches the [predicate].
@@ -192,7 +196,7 @@ abstract class Either<L, R> {
   /// of this [Either].
   @nonVirtual
   U fold<U>({U Function(L) ifLeft, U Function(R) ifRight}) {
-    return _isLeft ? ifLeft(_getLeft()) : ifRight(_get());
+    return isLeft ? ifLeft(_getLeft()) : ifRight(_get());
   }
 
   /// Applies the [transformer] to this [Either].
@@ -202,28 +206,28 @@ abstract class Either<L, R> {
   /// Converts a left value to a right value and vice versa.
   @nonVirtual
   Either<R, L> swap() {
-    return _isLeft ? Either<R, L>.right(_getLeft()) : Either<R, L>.left(_get());
+    return isLeft ? Either<R, L>.right(_getLeft()) : Either<R, L>.left(_get());
   }
 
   /// Executes the [mapper] and wraps the result in an [Either] if this [Either] is left sided.
   /// Otherwise it returns self.
   @nonVirtual
   Either<L, R> recover(R Function(L) mapper) {
-    return _isLeft ? Either<L, R>.right(mapper(_getLeft())) : this;
+    return isLeft ? Either<L, R>.right(mapper(_getLeft())) : this;
   }
 
   /// Executes the [mapper] if this [Either] is left sided.
   /// Otherwise it returns self.
   @nonVirtual
   Either<L, R> flatRecover(Either<L, R> Function(L) mapper) {
-    return _isLeft ? mapper(_getLeft()) : this;
+    return isLeft ? mapper(_getLeft()) : this;
   }
 
   /// Maps a value with the [ifLeft] function or the [ifRight] function depending on the content
   /// of this [Either].
   @nonVirtual
   Either<L2, R2> bimap<L2, R2>({L2 Function(L) ifLeft, R2 Function(R) ifRight}) {
-    if (_isLeft) {
+    if (isLeft) {
       return Either<L2, R2>.left(ifLeft(_getLeft()));
     } else {
       return Either<L2, R2>.right(ifRight(_get()));
@@ -233,38 +237,38 @@ abstract class Either<L, R> {
   /// Maps a left value held by this [Either] if there is one.
   @nonVirtual
   Either<U, R> mapLeft<U>(U Function(L) mapper) {
-    return _isLeft ? Either<U, R>.left(mapper(_getLeft())) : this;
+    return isLeft ? Either<U, R>.left(mapper(_getLeft())) : this;
   }
 
   /// Maps this [Either] to another one if it is left sided.
   @nonVirtual
   Either<U, R> flatMapLeft<U>(Either<U, R> Function(L) mapper) {
-    return _isLeft ? mapper(_getLeft()) : this;
+    return isLeft ? mapper(_getLeft()) : this;
   }
 
   /// Maps a right value held by this [Either] if there is one.
   @nonVirtual
   Either<L, U> map<U>(U Function(R) mapper) {
-    return _isLeft ? this : Either<L, U>.right(mapper(_get()));
+    return isLeft ? this : Either<L, U>.right(mapper(_get()));
   }
 
   /// Maps this [Either] to another one if it is right sided.
   @nonVirtual
   Either<L, U> flatMap<U>(Either<L, U> Function(R) mapper) {
-    return _isLeft ? this : mapper(_get());
+    return isLeft ? this : mapper(_get());
   }
 
   /// Executes the [ifLeft] consumer or the [ifRight] consumer depending on the content of this [Either].
   @nonVirtual
   void peek({Function(L) ifLeft, Function(R) ifRight}) {
-    _isLeft ? ifLeft(_getLeft()) : ifRight(_get());
+    isLeft ? ifLeft(_getLeft()) : ifRight(_get());
   }
 
   /// Converts this [Either] to an [Option] with a value if it is right sided. Otherwise an empty
   /// [Option] is returned.
   @nonVirtual
   Option<R> toOption() {
-    return _isLeft ? Option<R>.none() : Option<R>.some(_get());
+    return isLeft ? Option<R>.none() : Option<R>.some(_get());
   }
 
   /// Binds a right value of this [Either]. If no right value is present [effects] control flow is interrupted.
@@ -297,7 +301,7 @@ class _Right<L, R> extends Either<L, R> {
   L _getLeft() => throw const NoSuchElementException('no left value present');
 
   @override
-  bool get _isLeft => false;
+  bool get isLeft => false;
 }
 
 @immutable
@@ -324,7 +328,7 @@ class _Left<L, R> extends Either<L, R> {
   L _getLeft() => _value;
 
   @override
-  bool get _isLeft => true;
+  bool get isLeft => true;
 }
 
 /// Collection of effects over the [Either] type.

@@ -87,14 +87,19 @@ abstract class Option<T> {
     }
   }
 
-  bool get _isEmpty;
-
   T _get();
+
+  /// Returns `true` if this [Option] does not hold any value, `false` otherwise.
+  bool get isEmpty;
+
+  /// Returns `true` if this [Option] does hold any value, `false` otherwise.
+  @nonVirtual
+  bool get isNotEmpty => !isEmpty;
 
   /// Returns a value held by this [Option] or returns a value provided by the [provider].
   @nonVirtual
   T getOrElseProvide(T Function() provider) {
-    return _isEmpty ? provider() : _get();
+    return isEmpty ? provider() : _get();
   }
 
   /// Returns a value held by this [Option] or returns [other] value.
@@ -104,19 +109,19 @@ abstract class Option<T> {
   /// Returns a value held by this [Option] or throws an [Exception] from the [provider].
   @nonVirtual
   T getOrException(Exception Function() provider) {
-    return _isEmpty ? throw provider() : _get();
+    return isEmpty ? throw provider() : _get();
   }
 
   /// Returns a value held by this [Option] or throws an [Error] from the [provider].
   @nonVirtual
   T getOrError(Error Function() provider) {
-    return _isEmpty ? throw provider() : _get();
+    return isEmpty ? throw provider() : _get();
   }
 
   /// Returns an [Option] provided by the [provider] if there is no value.
   @nonVirtual
   Option<T> orElseProvide(Option<T> Function() provider) {
-    return _isEmpty ? provider() : this;
+    return isEmpty ? provider() : this;
   }
 
   /// Returns the [other] if there is no value.
@@ -126,7 +131,7 @@ abstract class Option<T> {
   /// Returns an empty [Option] if the value does not match the [predicate].
   @nonVirtual
   Option<T> filter(bool Function(T) predicate) {
-    return _isEmpty || predicate(_get()) ? this : Option<T>.none();
+    return isEmpty || predicate(_get()) ? this : Option<T>.none();
   }
 
   /// Returns and empty [Option] if the value matches the [predicate].
@@ -147,26 +152,26 @@ abstract class Option<T> {
   /// Maps a value held by this [Option] if there is one.
   @nonVirtual
   Option<R> map<R>(R Function(T) mapper) {
-    return _isEmpty ? Option<R>.none() : Option.some(mapper(_get()));
+    return isEmpty ? Option<R>.none() : Option.some(mapper(_get()));
   }
 
   /// Maps this [Option] to another one if currently there is a value being held.
   @nonVirtual
   Option<R> flatMap<R>(Option<R> Function(T) mapper) {
-    return _isEmpty ? Option<R>.none() : mapper(_get());
+    return isEmpty ? Option<R>.none() : mapper(_get());
   }
 
   /// Executes the [ifNone] function if this [Option] is empty, otherwise it uses the [ifSome] consumer.
   @nonVirtual
   void peek({Function() ifNone, Function(T) ifSome}) {
-    _isEmpty ? ifNone() : ifSome(_get());
+    isEmpty ? ifNone() : ifSome(_get());
   }
 
   /// Converts this [Option] to a right sided [Either] if there is a value. Otherwise a left sided
   /// [Either] is created with the [ifNone] value.
   @nonVirtual
   Either<L, T> toEither<L>(L ifNone) {
-    return _isEmpty ? Either<L, T>.left(ifNone) : Either<L, T>.right(_get());
+    return isEmpty ? Either<L, T>.left(ifNone) : Either<L, T>.right(_get());
   }
 
   /// Binds value of this [Option]. If no value is present [effects] control flow is interrupted.
@@ -193,7 +198,7 @@ class _Some<T> extends Option<T> {
   int get hashCode => _value.hashCode;
 
   @override
-  bool get _isEmpty => false;
+  bool get isEmpty => false;
 
   @override
   T _get() => _value;
@@ -213,7 +218,7 @@ class _None<T> extends Option<T> {
   int get hashCode => null.hashCode;
 
   @override
-  bool get _isEmpty => true;
+  bool get isEmpty => true;
 
   @override
   T _get() => throw const NoSuchElementException('no value present');
