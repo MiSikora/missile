@@ -296,6 +296,10 @@ void main() {
       either.peek(ifLeft: (_) => throw Error(), ifRight: (it) => value = '$it');
       expect(value, '1');
     });
+
+    test('can be converted to option', () {
+      expect(either.toOption(), Option<int>.some(1));
+    });
   });
 
   group('Left', () {
@@ -407,6 +411,10 @@ void main() {
       var value = '';
       either.peek(ifLeft: (it) => value = '$it', ifRight: (_) => throw Error());
       expect(value, '1');
+    });
+
+    test('can be converted to option', () {
+      expect(either.toOption(), const Option<int>.none());
     });
   });
 }

@@ -134,6 +134,10 @@ void main() {
       option.peek(ifNone: () => throw Error(), ifSome: (it) => value = '$it');
       expect(value, '1');
     });
+
+    test('can be converted to either', () {
+      expect(option.toEither(''), Either<String, int>.right(1));
+    });
   });
 
   group('None', () {
@@ -197,6 +201,10 @@ void main() {
       var value = '';
       option.peek(ifNone: () => value = '1', ifSome: (it) => throw Error());
       expect(value, '1');
+    });
+
+    test('can be converted to either', () {
+      expect(option.toEither('2'), Either<String, int>.left('2'));
     });
   });
 }

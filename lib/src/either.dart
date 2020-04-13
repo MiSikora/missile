@@ -1,3 +1,4 @@
+import 'package:bullseye/src/option.dart';
 import 'package:bullseye/src/utils.dart';
 import 'package:meta/meta.dart';
 
@@ -223,6 +224,13 @@ abstract class Either<L, R> {
   @nonVirtual
   void peek({Function(L) ifLeft, Function(R) ifRight}) {
     _isLeft ? ifLeft(_getLeft()) : ifRight(_get());
+  }
+
+  /// Converts this [Either] to an [Option] with a value if it is right sided. Otherwise an empty
+  /// [Option] is returned.
+  @nonVirtual
+  Option<R> toOption() {
+    return _isLeft ? Option<R>.none() : Option<R>.some(_get());
   }
 }
 
