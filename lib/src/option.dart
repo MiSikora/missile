@@ -53,6 +53,40 @@ abstract class Option<T> {
     }
   }
 
+  /// Allows to safely apply effects on [Option] containers. If any of the effects does not
+  /// succeed computation is stopped and empty [Option] is returned.
+  ///
+  /// ```dart
+  /// // Results in an option with a value.
+  /// final sum = await Option.fxAsync((effects) async {
+  ///   final awaitedOne = await Future.value(Option.some(1));
+  ///   final awaitedTwo = await Future.value(Option.some(2));
+  ///   final awaitedThree = await Future.value(Option.some(3));
+  ///   final one = awaitedOne.bind(effects);
+  ///   final two = awaitedTwo.bind(effects);
+  ///   final three = awaitedThree.bind(effects);
+  ///   return one + two + three;
+  /// });
+  ///
+  /// // Results in an option without a value.
+  /// final sum = await Option.fxAsync((effects) async {
+  ///   final awaitedOne = await Future.value(Option.some(1));
+  ///   final awaitedTwo = await Future.value(Option.none());
+  ///   final awaitedThree = await Future.value(Option.some(3));
+  ///   final one = awaitedOne.bind(effects);
+  ///   final two = awaitedTwo.bind(effects);
+  ///   final three = awaitedThree.bind(effects);
+  ///   return one + two + three;
+  /// });
+  /// ```
+  static Future<Option<T>> fxAsync<T>(Future<T> Function(OptionFx) function) async {
+    try {
+      return Option<T>.some(await function(const OptionFx._instance()));
+    } on _NoOptionValueException catch (_) {
+      return Option<T>.none();
+    }
+  }
+
   bool get _isEmpty;
 
   T _get();

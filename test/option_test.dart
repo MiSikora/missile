@@ -70,6 +70,92 @@ void main() {
         throwsError,
       );
     });
+
+    test('async fx computes the value if all bounded values exist', () {
+      final sum = Option.fxAsync((effects) async {
+        final awaitedOne = await Future.value(Option.some(1));
+        final awaitedTwo = await Future.value(Option.some(2));
+        final awaitedThree = await Future.value(Option.some(3));
+        final one = awaitedOne.bind(effects);
+        final two = awaitedTwo.bind(effects);
+        final three = awaitedThree.bind(effects);
+        return one + two + three;
+      });
+      expect(sum, completion(Option.some(6)));
+    });
+
+    test('async fx stops computation if any of the bounded values does not exist', () {
+      final sum = Option.fxAsync((effects) async {
+        final awaitedOne = await Future.value(Option.some(1));
+        final awaitedTwo = await Future.value(const Option<int>.none());
+        final awaitedThree = await Future.value(Option.some(3));
+        final one = awaitedOne.bind(effects);
+        final two = awaitedTwo.bind(effects);
+        final three = awaitedThree.bind(effects);
+        return one + two + three;
+      });
+      expect(sum, completion(const Option<int>.none()));
+    });
+
+    test('async fx rethrows future exception', () {
+      expect(
+        Option.fxAsync((effects) async {
+          final awaitedOne = await Future.error(Exception());
+          final awaitedTwo = await Future.value(const Option<int>.none());
+          final awaitedThree = await Future.value(Option.some(3));
+          final one = awaitedOne.bind(effects);
+          final two = awaitedTwo.bind(effects);
+          final three = awaitedThree.bind(effects);
+          return one + two + three;
+        }),
+        throwsException,
+      );
+    });
+
+    test('async fx rethrows future error', () {
+      expect(
+        Option.fxAsync((effects) async {
+          final awaitedOne = await Future.error(Error());
+          final awaitedTwo = await Future.value(const Option<int>.none());
+          final awaitedThree = await Future.value(Option.some(3));
+          final one = awaitedOne.bind(effects);
+          final two = awaitedTwo.bind(effects);
+          final three = awaitedThree.bind(effects);
+          return one + two + three;
+        }),
+        throwsError,
+      );
+    });
+
+    test('async fx rethrows exception', () {
+      expect(
+        Option.fxAsync((effects) async {
+          final awaitedOne = await Future.value(Option.some(1));
+          final awaitedTwo = await Future.value(const Option<int>.none());
+          final awaitedThree = await Future.value(Option.some(3));
+          final one = awaitedOne.bind(effects);
+          final two = awaitedTwo.getOrException(() => Exception());
+          final three = awaitedThree.bind(effects);
+          return one + two + three;
+        }),
+        throwsException,
+      );
+    });
+
+    test('async fx rethrows error', () {
+      expect(
+        Option.fxAsync((effects) async {
+          final awaitedOne = await Future.value(Option.some(1));
+          final awaitedTwo = await Future.value(const Option<int>.none());
+          final awaitedThree = await Future.value(Option.some(3));
+          final one = awaitedOne.bind(effects);
+          final two = awaitedTwo.getOrError(() => Error());
+          final three = awaitedThree.bind(effects);
+          return one + two + three;
+        }),
+        throwsError,
+      );
+    });
   });
 
   group('Some', () {

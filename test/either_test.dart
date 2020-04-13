@@ -186,6 +186,92 @@ void main() {
         throwsError,
       );
     });
+
+    test('async fx computes the value if all bounded are right', () {
+      final sum = Either.fxAsync((effects) async {
+        final awaitedOne = await Future.value(Either<String, int>.right(1));
+        final awaitedTwo = await Future.value(Either<String, int>.right(2));
+        final awaitedThree = await Future.value(Either<String, int>.right(3));
+        final one = awaitedOne.bind(effects);
+        final two = awaitedTwo.bind(effects);
+        final three = awaitedThree.bind(effects);
+        return one + two + three;
+      });
+      expect(sum, completion(Either<String, int>.right(6)));
+    });
+
+    test('async fx stops computation if any of the bounded values is left', () {
+      final sum = Either.fxAsync((effects) async {
+        final awaitedOne = await Future.value(Either<String, int>.right(1));
+        final awaitedTwo = await Future.value(Either<String, int>.left('hello'));
+        final awaitedThree = await Future.value(Either<String, int>.right(3));
+        final one = awaitedOne.bind(effects);
+        final two = awaitedTwo.bind(effects);
+        final three = awaitedThree.bind(effects);
+        return one + two + three;
+      });
+      expect(sum, completion(Either<String, int>.left('hello')));
+    });
+
+    test('async fx rethrows future exception', () {
+      expect(
+        () => Either.fxAsync<String, int>((effects) async {
+          final awaitedOne = await Future.error(Exception());
+          final awaitedTwo = await Future.value(Either<String, int>.right(2));
+          final awaitedThree = await Future.value(Either<String, int>.right(3));
+          final one = awaitedOne.bind(effects);
+          final two = awaitedTwo.bind(effects);
+          final three = awaitedThree.bind(effects);
+          return one + two + three;
+        }),
+        throwsException,
+      );
+    });
+
+    test('async fx rethrows future error', () {
+      expect(
+        () => Either.fxAsync<String, int>((effects) async {
+          final awaitedOne = await Future.error(Error());
+          final awaitedTwo = await Future.value(Either<String, int>.right(2));
+          final awaitedThree = await Future.value(Either<String, int>.right(3));
+          final one = awaitedOne.bind(effects);
+          final two = awaitedTwo.bind(effects);
+          final three = awaitedThree.bind(effects);
+          return one + two + three;
+        }),
+        throwsError,
+      );
+    });
+
+    test('async fx rethrows exception', () {
+      expect(
+        () => Either.fxAsync<String, int>((effects) async {
+          final awaitedOne = await Future.value(Either<String, int>.right(1));
+          final awaitedTwo = await Future.value(Either<String, int>.left('hello'));
+          final awaitedThree = await Future.value(Either<String, int>.right(3));
+          final one = awaitedOne.bind(effects);
+          final two = awaitedTwo.getOrException(() => Exception());
+          final three = awaitedThree.bind(effects);
+          return one + two + three;
+        }),
+        throwsException,
+      );
+    });
+
+    test('async fx rethrows error', () {
+      expect(
+        () => Either.fxAsync<String, int>((effects) async {
+          final awaitedOne = await Future.value(Either<String, int>.right(1));
+          final awaitedTwo = await Future.value(Either<String, int>.left('hello'));
+          final awaitedThree = await Future.value(Either<String, int>.right(3));
+          final one = awaitedOne.bind(effects);
+          final two = awaitedTwo.getOrError(() => Error());
+          final three = awaitedThree.bind(effects);
+          return one + two + three;
+        }),
+        throwsError,
+      );
+    });
   });
 
   group('Right', () {

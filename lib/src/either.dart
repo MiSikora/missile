@@ -84,6 +84,40 @@ abstract class Either<L, R> {
     }
   }
 
+  /// Allows to safely bind values in [Either] containers. If any of the bounded values
+  /// does not exists computation is stopped and left sided [Either] is returned.
+  ///
+  /// ```dart
+  /// // Results in an either with a right value of '6'.
+  /// final sum = await Either.fxAsync((effects) async {
+  ///   final awaitedOne = await Future.value(Either.right(1));
+  ///   final awaitedTwo = await Future.value(Either.right(2));
+  ///   final awaitedThree = await Future.value(Either.right(3));
+  ///   final one = awaitedOne.bind(effects);
+  ///   final two = awaitedTwo.bind(effects);
+  ///   final three = awaitedThree.bind(effects);
+  ///   return one + two + three;
+  /// });
+  ///
+  /// // Results in an either with a left value of 'false'.
+  /// final sum = await Either.fxAsync((effects) async {
+  ///   final awaitedOne = await Future.value(Either.right(1));
+  ///   final awaitedTwo = await Future.value(Either.left(false));
+  ///   final awaitedThree = await Future.value(Either.right(3));
+  ///   final one = awaitedOne.bind(effects);
+  ///   final two = awaitedTwo.bind(effects);
+  ///   final three = awaitedThree.bind(effects);
+  ///   return one + two + three;
+  /// });
+  /// ```
+  static Future<Either<L, R>> fxAsync<L,R>(Future<R> Function(EitherFx<L>) function) async {
+    try {
+      return Either<L, R>.right(await function(EitherFx<L>._instance()));
+    } on _NoRightValueException catch (e) {
+      return Either<L, R>.left(e.left);
+    }
+  }
+
   bool get _isLeft;
 
   R _get();
