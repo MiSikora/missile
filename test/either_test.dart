@@ -5,14 +5,6 @@ import 'test_util.dart';
 
 void main() {
   group('Either', () {
-    test('cannot be created with null for left', () {
-      expect(() => Either.left(null), throwsArgumentError);
-    });
-
-    test('cannot be created with null for right', () {
-      expect(() => Either.right(null), throwsArgumentError);
-    });
-
     group('created as exception safe', () {
       test('yields a provided value', () {
         expect(
@@ -20,7 +12,7 @@ void main() {
             provider: () => 1,
             onException: (exception) => throw exception,
           ),
-          Either<String, int>.right(1),
+          const Either<String, int>.right(1),
         );
       });
 
@@ -30,7 +22,7 @@ void main() {
             provider: () => throw const FormatException('message'),
             onException: (exception) => (exception as FormatException).message,
           ),
-          Either<String, int>.left('message'),
+          const Either<String, int>.left('message'),
         );
       });
 
@@ -52,7 +44,7 @@ void main() {
             provider: () => 1,
             onError: (error) => throw error,
           ),
-          Either<String, int>.right(1),
+          const Either<String, int>.right(1),
         );
       });
 
@@ -62,7 +54,7 @@ void main() {
             provider: () => throw StateError('message'),
             onError: (error) => (error as StateError).message,
           ),
-          Either<String, int>.left('message'),
+          const Either<String, int>.left('message'),
         );
       });
 
@@ -84,7 +76,7 @@ void main() {
             provider: () => 1,
             orElse: (_) => throw Error(),
           ),
-          Either<String, int>.right(1),
+          const Either<String, int>.right(1),
         );
       });
 
@@ -94,7 +86,7 @@ void main() {
             provider: () => throw const FormatException('message'),
             orElse: (e) => (e.getOrError(() => Error()) as FormatException).message,
           ),
-          Either<String, int>.left('message'),
+          const Either<String, int>.left('message'),
         );
       });
 
@@ -104,7 +96,7 @@ void main() {
             provider: () => throw StateError('message'),
             orElse: (e) => (e.swap().getOrException(() => Exception()) as StateError).message,
           ),
-          Either<String, int>.left('message'),
+          const Either<String, int>.left('message'),
         );
       });
     });
@@ -116,7 +108,7 @@ void main() {
             provider: () => 1,
             orElse: 'message',
           ),
-          Either<String, int>.right(1),
+          const Either<String, int>.right(1),
         );
       });
 
@@ -126,7 +118,7 @@ void main() {
             provider: () => throw const FormatException('message'),
             orElse: 'message',
           ),
-          Either<String, int>.left('message'),
+          const Either<String, int>.left('message'),
         );
       });
 
@@ -136,7 +128,7 @@ void main() {
             provider: () => throw StateError('message'),
             orElse: 'message',
           ),
-          Either<String, int>.left('message'),
+          const Either<String, int>.left('message'),
         );
       });
     });
@@ -145,30 +137,30 @@ void main() {
   group('Effect', () {
     test('fx computes the value if all bounded are right', () {
       final sum = Either.fx<String, int>((effects) {
-        final one = Either<String, int>.right(1).bind(effects);
-        final two = Either<String, int>.right(2).bind(effects);
-        final three = Either<String, int>.right(3).bind(effects);
+        final one = const Either<String, int>.right(1).bind(effects);
+        final two = const Either<String, int>.right(2).bind(effects);
+        final three = const Either<String, int>.right(3).bind(effects);
         return one + two + three;
       });
-      expect(sum, Either<String, int>.right(6));
+      expect(sum, const Either<String, int>.right(6));
     });
 
     test('fx stops computation if any of the bounded values is left', () {
       final sum = Either.fx<String, int>((effects) {
-        final one = Either<String, int>.right(1).bind(effects);
-        final two = Either<String, int>.left('hello').bind(effects);
-        final three = Either<String, int>.right(3).bind(effects);
+        final one = const Either<String, int>.right(1).bind(effects);
+        final two = const Either<String, int>.left('hello').bind(effects);
+        final three = const Either<String, int>.right(3).bind(effects);
         return one + two + three;
       });
-      expect(sum, Either<String, int>.left('hello'));
+      expect(sum, const Either<String, int>.left('hello'));
     });
 
     test('fx rethrows exception', () {
       expect(
         () => Either.fx<String, int>((effects) {
-          final one = Either<String, int>.right(1).bind(effects);
-          final two = Either<String, int>.left('hello').getOrException(() => Exception());
-          final three = Either<String, int>.right(3).bind(effects);
+          final one = const Either<String, int>.right(1).bind(effects);
+          final two = const Either<String, int>.left('hello').getOrException(() => Exception());
+          final three = const Either<String, int>.right(3).bind(effects);
           return one + two + three;
         }),
         throwsException,
@@ -178,9 +170,9 @@ void main() {
     test('fx rethrows error', () {
       expect(
         () => Either.fx<String, int>((effects) {
-          final one = Either<String, int>.right(1).bind(effects);
-          final two = Either<String, int>.left('hello').getOrError(() => Error());
-          final three = Either<String, int>.right(3).bind(effects);
+          final one = const Either<String, int>.right(1).bind(effects);
+          final two = const Either<String, int>.left('hello').getOrError(() => Error());
+          final three = const Either<String, int>.right(3).bind(effects);
           return one + two + three;
         }),
         throwsError,
@@ -189,36 +181,36 @@ void main() {
 
     test('async fx computes the value if all bounded are right', () {
       final sum = Either.fxAsync((effects) async {
-        final awaitedOne = await Future.value(Either<String, int>.right(1));
-        final awaitedTwo = await Future.value(Either<String, int>.right(2));
-        final awaitedThree = await Future.value(Either<String, int>.right(3));
+        final awaitedOne = await Future.value(const Either<String, int>.right(1));
+        final awaitedTwo = await Future.value(const Either<String, int>.right(2));
+        final awaitedThree = await Future.value(const Either<String, int>.right(3));
         final one = awaitedOne.bind(effects);
         final two = awaitedTwo.bind(effects);
         final three = awaitedThree.bind(effects);
         return one + two + three;
       });
-      expect(sum, completion(Either<String, int>.right(6)));
+      expect(sum, completion(const Either<String, int>.right(6)));
     });
 
     test('async fx stops computation if any of the bounded values is left', () {
       final sum = Either.fxAsync((effects) async {
-        final awaitedOne = await Future.value(Either<String, int>.right(1));
-        final awaitedTwo = await Future.value(Either<String, int>.left('hello'));
-        final awaitedThree = await Future.value(Either<String, int>.right(3));
+        final awaitedOne = await Future.value(const Either<String, int>.right(1));
+        final awaitedTwo = await Future.value(const Either<String, int>.left('hello'));
+        final awaitedThree = await Future.value(const Either<String, int>.right(3));
         final one = awaitedOne.bind(effects);
         final two = awaitedTwo.bind(effects);
         final three = awaitedThree.bind(effects);
         return one + two + three;
       });
-      expect(sum, completion(Either<String, int>.left('hello')));
+      expect(sum, completion(const Either<String, int>.left('hello')));
     });
 
     test('async fx rethrows future exception', () {
       expect(
         () => Either.fxAsync<String, int>((effects) async {
           final awaitedOne = await Future.error(Exception());
-          final awaitedTwo = await Future.value(Either<String, int>.right(2));
-          final awaitedThree = await Future.value(Either<String, int>.right(3));
+          final awaitedTwo = await Future.value(const Either<String, int>.right(2));
+          final awaitedThree = await Future.value(const Either<String, int>.right(3));
           final one = awaitedOne.bind(effects);
           final two = awaitedTwo.bind(effects);
           final three = awaitedThree.bind(effects);
@@ -232,8 +224,8 @@ void main() {
       expect(
         () => Either.fxAsync<String, int>((effects) async {
           final awaitedOne = await Future.error(Error());
-          final awaitedTwo = await Future.value(Either<String, int>.right(2));
-          final awaitedThree = await Future.value(Either<String, int>.right(3));
+          final awaitedTwo = await Future.value(const Either<String, int>.right(2));
+          final awaitedThree = await Future.value(const Either<String, int>.right(3));
           final one = awaitedOne.bind(effects);
           final two = awaitedTwo.bind(effects);
           final three = awaitedThree.bind(effects);
@@ -246,9 +238,9 @@ void main() {
     test('async fx rethrows exception', () {
       expect(
         () => Either.fxAsync<String, int>((effects) async {
-          final awaitedOne = await Future.value(Either<String, int>.right(1));
-          final awaitedTwo = await Future.value(Either<String, int>.left('hello'));
-          final awaitedThree = await Future.value(Either<String, int>.right(3));
+          final awaitedOne = await Future.value(const Either<String, int>.right(1));
+          final awaitedTwo = await Future.value(const Either<String, int>.left('hello'));
+          final awaitedThree = await Future.value(const Either<String, int>.right(3));
           final one = awaitedOne.bind(effects);
           final two = awaitedTwo.getOrException(() => Exception());
           final three = awaitedThree.bind(effects);
@@ -261,9 +253,9 @@ void main() {
     test('async fx rethrows error', () {
       expect(
         () => Either.fxAsync<String, int>((effects) async {
-          final awaitedOne = await Future.value(Either<String, int>.right(1));
-          final awaitedTwo = await Future.value(Either<String, int>.left('hello'));
-          final awaitedThree = await Future.value(Either<String, int>.right(3));
+          final awaitedOne = await Future.value(const Either<String, int>.right(1));
+          final awaitedTwo = await Future.value(const Either<String, int>.left('hello'));
+          final awaitedThree = await Future.value(const Either<String, int>.right(3));
           final one = awaitedOne.bind(effects);
           final two = awaitedTwo.getOrError(() => Error());
           final three = awaitedThree.bind(effects);
@@ -275,7 +267,7 @@ void main() {
   });
 
   group('Right', () {
-    final either = Either<String, int>.right(1);
+    const either = Either<String, int>.right(1);
 
     test('is right', () {
       expect(either.isLeft, false);
@@ -301,38 +293,38 @@ void main() {
     test('can be filtered', () {
       expect(
         either.filterOrElseProvide(predicate: (it) => it != 1, orElse: () => 'foo'),
-        Either<String, int>.left('foo'),
+        const Either<String, int>.left('foo'),
       );
       expect(
         either.filterOrElse(predicate: (it) => it != 1, orElse: 'foo'),
-        Either<String, int>.left('foo'),
+        const Either<String, int>.left('foo'),
       );
       expect(
         either.filterNotOrElseProvide(predicate: (it) => it == 1, orElse: () => 'foo'),
-        Either<String, int>.left('foo'),
+        const Either<String, int>.left('foo'),
       );
       expect(
         either.filterNotOrElse(predicate: (it) => it == 1, orElse: 'foo'),
-        Either<String, int>.left('foo'),
+        const Either<String, int>.left('foo'),
       );
     });
 
     test('can be not filtered', () {
       expect(
         either.filterOrElseProvide(predicate: (it) => it == 1, orElse: () => throw Error()),
-        Either<String, int>.right(1),
+        const Either<String, int>.right(1),
       );
       expect(
         either.filterOrElse(predicate: (it) => it == 1, orElse: 'foo'),
-        Either<String, int>.right(1),
+        const Either<String, int>.right(1),
       );
       expect(
         either.filterNotOrElseProvide(predicate: (it) => it != 1, orElse: () => throw Error()),
-        Either<String, int>.right(1),
+        const Either<String, int>.right(1),
       );
       expect(
         either.filterNotOrElse(predicate: (it) => it != 1, orElse: 'foo'),
-        Either<String, int>.right(1),
+        const Either<String, int>.right(1),
       );
     });
 
@@ -346,40 +338,40 @@ void main() {
     });
 
     test('can be swapped', () {
-      expect(either.swap(), Either<int, String>.left(1));
+      expect(either.swap(), const Either<int, String>.left(1));
     });
 
     test('does not recover', () {
-      expect(either.recover((_) => throw Error()), Either<String, int>.right(1));
+      expect(either.recover((_) => throw Error()), const Either<String, int>.right(1));
     });
 
     test('does not flat recover', () {
-      expect(either.flatRecover((_) => throw Error()), Either<String, int>.right(1));
+      expect(either.flatRecover((_) => throw Error()), const Either<String, int>.right(1));
     });
 
     test('uses right bimap mapper', () {
       final mappedEither = either.bimap(ifLeft: (_) => throw Error(), ifRight: (it) => '$it');
-      expect(mappedEither, Either<String, String>.right('1'));
+      expect(mappedEither, const Either<String, String>.right('1'));
     });
 
     test('cannot be left mapped', () {
       final mappedEither = either.mapLeft((_) => '1');
-      expect(mappedEither, Either<String, int>.right(1));
+      expect(mappedEither, const Either<String, int>.right(1));
     });
 
     test('cannot be left flat mapped', () {
-      final mappedEither = either.flatMapLeft((_) => Either<String, int>.left('1'));
-      expect(mappedEither, Either<String, int>.right(1));
+      final mappedEither = either.flatMapLeft((_) => const Either<String, int>.left('1'));
+      expect(mappedEither, const Either<String, int>.right(1));
     });
 
     test('can be mapped', () {
       final mappedEither = either.map((it) => '$it');
-      expect(mappedEither, Either<String, String>.right('1'));
+      expect(mappedEither, const Either<String, String>.right('1'));
     });
 
     test('can be flat mapped', () {
-      final mappedEither = either.flatMap((it) => Either<String, int>.right(2));
-      expect(mappedEither, Either<String, int>.right(2));
+      final mappedEither = either.flatMap((it) => const Either<String, int>.right(2));
+      expect(mappedEither, const Either<String, int>.right(2));
     });
 
     test('uses right peek consumer', () {
@@ -394,7 +386,7 @@ void main() {
   });
 
   group('Left', () {
-    final either = Either<int, String>.left(1);
+    const either = Either<int, String>.left(1);
 
     test('is left', () {
       expect(either.isLeft, true);
@@ -420,38 +412,38 @@ void main() {
     test('is never filtered', () {
       expect(
         either.filterOrElseProvide(predicate: (it) => it != '1', orElse: () => throw Error()),
-        Either<int, String>.left(1),
+        const Either<int, String>.left(1),
       );
       expect(
         either.filterOrElse(predicate: (it) => it != '1', orElse: 2),
-        Either<int, String>.left(1),
+        const Either<int, String>.left(1),
       );
       expect(
         either.filterNotOrElseProvide(predicate: (it) => it == '1', orElse: () => throw Error()),
-        Either<int, String>.left(1),
+        const Either<int, String>.left(1),
       );
       expect(
         either.filterNotOrElse(predicate: (it) => it == '1', orElse: 2),
-        Either<int, String>.left(1),
+        const Either<int, String>.left(1),
       );
     });
 
     test('is always not filtered', () {
       expect(
         either.filterOrElseProvide(predicate: (it) => it == '1', orElse: () => throw Error()),
-        Either<int, String>.left(1),
+        const Either<int, String>.left(1),
       );
       expect(
         either.filterOrElse(predicate: (it) => it == '1', orElse: 2),
-        Either<int, String>.left(1),
+        const Either<int, String>.left(1),
       );
       expect(
         either.filterNotOrElseProvide(predicate: (it) => it != '1', orElse: () => throw Error()),
-        Either<int, String>.left(1),
+        const Either<int, String>.left(1),
       );
       expect(
         either.filterNotOrElse(predicate: (it) => it != '1', orElse: 2),
-        Either<int, String>.left(1),
+        const Either<int, String>.left(1),
       );
     });
 
@@ -465,42 +457,42 @@ void main() {
     });
 
     test('can be swapped', () {
-      expect(either.swap(), Either<String, int>.right(1));
+      expect(either.swap(), const Either<String, int>.right(1));
     });
 
     test('can be recovered', () {
       final recoveredEither = either.recover((it) => '$it');
-      expect(recoveredEither, Either<int, String>.right('1'));
+      expect(recoveredEither, const Either<int, String>.right('1'));
     });
 
     test('can be flat recovered', () {
       final recoveredEither = either.flatRecover((it) => Either<int, String>.left(it + 1));
-      expect(recoveredEither, Either<int, String>.left(2));
+      expect(recoveredEither, const Either<int, String>.left(2));
     });
 
     test('uses left bimap mapper', () {
       final mappedEither = either.bimap(ifLeft: (it) => '$it', ifRight: (_) => throw Error());
-      expect(mappedEither, Either<String, String>.left('1'));
+      expect(mappedEither, const Either<String, String>.left('1'));
     });
 
     test('can be left mapped', () {
       final mappedEither = either.mapLeft((it) => '$it');
-      expect(mappedEither, Either<String, String>.left('1'));
+      expect(mappedEither, const Either<String, String>.left('1'));
     });
 
     test('can be left flat mapped', () {
       final mappedEither = either.flatMapLeft((it) => Either<String, String>.left('$it'));
-      expect(mappedEither, Either<String, String>.left('1'));
+      expect(mappedEither, const Either<String, String>.left('1'));
     });
 
     test('cannot be mapped', () {
       final mappedEither = either.map((_) => '2');
-      expect(mappedEither, Either<int, String>.left(1));
+      expect(mappedEither, const Either<int, String>.left(1));
     });
 
     test('cannot be flat mapped', () {
-      final mappedEither = either.flatMap((it) => Either<int, String>.right('2'));
-      expect(mappedEither, Either<int, String>.left(1));
+      final mappedEither = either.flatMap((it) => const Either<int, String>.right('2'));
+      expect(mappedEither, const Either<int, String>.left(1));
     });
 
     test('uses left peek consumer', () {

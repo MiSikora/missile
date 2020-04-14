@@ -8,10 +8,10 @@ abstract class Either<L, R> {
   const Either._();
 
   /// Creates a new [Either] with a provided non-null right [value].
-  factory Either.right(R value) = _Right<L, R>;
+  const factory Either.right(R value) = _Right<L, R>;
 
   /// Creates a new [Either] with a provided non-null left [value].
-  factory Either.left(L value) = _Left<L, R>;
+  const factory Either.left(L value) = _Left<L, R>;
 
   /// Creates a right sided [Either] if the [provider] does not fail to yield a value.
   /// If an [Exception] or [Error] is thrown a left side [Either] is created from the [orElse] function.
@@ -281,9 +281,7 @@ abstract class Either<L, R> {
 class _Right<L, R> extends Either<L, R> {
   final R _value;
 
-  _Right(R value)
-      : _value = requireNotNull(value),
-        super._();
+  const _Right(this._value) : super._();
 
   @override
   String toString() => 'Right(value=$_value)';
@@ -308,9 +306,7 @@ class _Right<L, R> extends Either<L, R> {
 class _Left<L, R> extends Either<L, R> {
   final L _value;
 
-  _Left(L value)
-      : _value = requireNotNull(value),
-        super._();
+  const _Left(this._value) : super._();
 
   @override
   String toString() => 'Left(value=$_value)';
