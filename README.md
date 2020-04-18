@@ -1,6 +1,6 @@
 # Bullseye
 
-TODO
+Immutable and functional primitives for Dart.
 
 ## License
 
