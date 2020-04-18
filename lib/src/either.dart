@@ -110,7 +110,7 @@ abstract class Either<L, R> {
   ///   return one + two + three;
   /// });
   /// ```
-  static Future<Either<L, R>> fxAsync<L,R>(Future<R> Function(EitherFx<L>) function) async {
+  static Future<Either<L, R>> fxAsync<L, R>(Future<R> Function(EitherFx<L>) function) async {
     try {
       return Either<L, R>.right(await function(EitherFx<L>._instance()));
     } on _NoRightValueException catch (e) {
