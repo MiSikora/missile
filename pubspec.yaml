@@ -1,5 +1,5 @@
 name: missile
-description: Immutable and functional primitives for Dart.
+description: Immutable and functional primitives for Dart that provides safe type effects.
 homepage: https://github.com/MiSikora/missile
 version: 0.1.0
 
