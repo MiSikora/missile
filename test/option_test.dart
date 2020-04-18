@@ -220,6 +220,20 @@ void main() {
       expect(mappedOption, Option.some(2));
     });
 
+    test('can be async mapped', () {
+      expect(
+        option.mapAsync((it) async => it + 1),
+        completion(Option.some(2)),
+      );
+    });
+
+    test('can be async flat mapped', () {
+      expect(
+        option.flatMapAsync((it) async => Option.some(it + 1)),
+        completion(Option.some(2)),
+      );
+    });
+
     test('uses some peek consumer', () {
       var value = '';
       option.peek(ifNone: () => throw Error(), ifSome: (it) => value = '$it');
@@ -227,7 +241,7 @@ void main() {
     });
 
     test('can be converted to either', () {
-      expect(option.toEither(''), Either<String, int>.right(1));
+      expect(option.toEither(''), const Either<String, int>.right(1));
     });
   });
 
@@ -288,9 +302,18 @@ void main() {
       expect(mappedOption, const Option.none());
     });
 
-    test('cannot be flat mapped', () {
-      final mappedOption = option.flatMap((it) => Option.some(it + 1));
-      expect(mappedOption, const Option.none());
+    test('cannot be async mapped', () {
+      expect(
+        option.mapAsync((it) async => it + 1),
+        completion(const Option.none()),
+      );
+    });
+
+    test('cannot be async flat mapped', () {
+      expect(
+        option.flatMapAsync((it) async => Option.some(it + 1)),
+        completion(const Option.none()),
+      );
     });
 
     test('uses none peek consumer', () {
@@ -300,7 +323,7 @@ void main() {
     });
 
     test('can be converted to either', () {
-      expect(option.toEither('2'), Either<String, int>.left('2'));
+      expect(option.toEither('2'), const Either<String, int>.left('2'));
     });
   });
 }

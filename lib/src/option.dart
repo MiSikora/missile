@@ -155,9 +155,21 @@ abstract class Option<T> {
     return isEmpty ? Option<R>.none() : Option.some(mapper(_get()));
   }
 
+  /// Maps a value held by this [Option] if there is one.
+  @nonVirtual
+  Future<Option<R>> mapAsync<R>(Future<R> Function(T) mapper) async {
+    return isEmpty ? Option<R>.none() : Option.some(await mapper(_get()));
+  }
+
   /// Maps this [Option] to another one if currently there is a value being held.
   @nonVirtual
   Option<R> flatMap<R>(Option<R> Function(T) mapper) {
+    return isEmpty ? Option<R>.none() : mapper(_get());
+  }
+
+  /// Maps this [Option] to another one if currently there is a value being held.
+  @nonVirtual
+  Future<Option<R>> flatMapAsync<R>(Future<Option<R>> Function(T) mapper) async {
     return isEmpty ? Option<R>.none() : mapper(_get());
   }
 
