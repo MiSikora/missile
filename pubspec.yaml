@@ -1,5 +1,6 @@
 name: bullseye
 description: Immutable and functional primitives for Dart.
+homepage: https://github.com/MiSikora/Bullseye
 version: 0.1.0
 
 environment:
