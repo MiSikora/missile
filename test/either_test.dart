@@ -349,6 +349,20 @@ void main() {
       expect(either.flatRecover((_) => throw Error()), const Either<String, int>.right(1));
     });
 
+    test('does not async recovered', () {
+      expect(
+        either.recoverAsync((_) async => throw Error()),
+        completion(const Either<String, int>.right(1)),
+      );
+    });
+
+    test('does not async flat recovered', () {
+      expect(
+        either.flatRecoverAsync((_) async => throw Error()),
+        completion(const Either<String, int>.right(1)),
+      );
+    });
+
     test('uses right bimap mapper', () {
       final mappedEither = either.bimap(ifLeft: (_) => throw Error(), ifRight: (it) => '$it');
       expect(mappedEither, const Either<String, String>.right('1'));
@@ -374,6 +388,19 @@ void main() {
       expect(mappedEither, const Either<String, int>.right(2));
     });
 
+    test('can be async mapped', () {
+      expect(
+        either.mapAsync((it) async => '$it'),
+        completion(const Either<String, String>.right('1')),
+      );
+    });
+
+    test('can be async flat mapped', () {
+      expect(
+        either.flatMapAsync((it) async => const Either<String, int>.right(2)),
+        completion(const Either<String, int>.right(2)),
+      );
+    });
     test('uses right peek consumer', () {
       var value = '';
       either.peek(ifLeft: (_) => throw Error(), ifRight: (it) => value = '$it');
@@ -470,6 +497,20 @@ void main() {
       expect(recoveredEither, const Either<int, String>.left(2));
     });
 
+    test('can be async recovered', () {
+      expect(
+        either.recoverAsync((it) async => '$it'),
+        completion(const Either<int, String>.right('1')),
+      );
+    });
+
+    test('can be async flat recovered', () {
+      expect(
+        either.flatRecoverAsync((it) async => Either<int, String>.left(it + 1)),
+        completion(const Either<int, String>.left(2)),
+      );
+    });
+
     test('uses left bimap mapper', () {
       final mappedEither = either.bimap(ifLeft: (it) => '$it', ifRight: (_) => throw Error());
       expect(mappedEither, const Either<String, String>.left('1'));
@@ -493,6 +534,20 @@ void main() {
     test('cannot be flat mapped', () {
       final mappedEither = either.flatMap((it) => const Either<int, String>.right('2'));
       expect(mappedEither, const Either<int, String>.left(1));
+    });
+
+    test('cannot be async mapped', () {
+      expect(
+        either.mapAsync((_) async => '2'),
+        completion(const Either<int, String>.left(1)),
+      );
+    });
+
+    test('cannot be async flat mapped', () {
+      expect(
+        either.flatMapAsync((it) async => const Either<int, String>.right('2')),
+        completion(const Either<int, String>.left(1)),
+      );
     });
 
     test('uses left peek consumer', () {
