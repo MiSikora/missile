@@ -141,7 +141,7 @@ abstract class Option<T> {
   /// Returns from the [ifNone] provider if there is no value or from the [ifSome] mapper
   /// if there is one.
   @nonVirtual
-  R fold<R>({R Function() ifNone, R Function(T) ifSome}) {
+  R fold<R>({@required R Function() ifNone, @required R Function(T) ifSome}) {
     return map(ifSome).getOrElseProvide(ifNone);
   }
 
@@ -175,7 +175,7 @@ abstract class Option<T> {
 
   /// Executes the [ifNone] function if this [Option] is empty, otherwise it uses the [ifSome] consumer.
   @nonVirtual
-  void peek({Function() ifNone, Function(T) ifSome}) {
+  void peek({@required Function() ifNone, @required Function(T) ifSome}) {
     isEmpty ? ifNone() : ifSome(_get());
   }
 

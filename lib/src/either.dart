@@ -16,8 +16,8 @@ abstract class Either<L, R> {
   /// Creates a right sided [Either] if the [provider] does not fail to yield a value.
   /// If an [Exception] or [Error] is thrown a left side [Either] is created from the [orElse] function.
   factory Either.tryOrElseProvide({
-    R Function() provider,
-    L Function(Either<Error, Exception>) orElse,
+    @required R Function() provider,
+    @required L Function(Either<Error, Exception>) orElse,
   }) {
     try {
       return Either<L, R>.right(provider());
@@ -30,14 +30,17 @@ abstract class Either<L, R> {
 
   /// Creates a right sided [Either] if the [provider] does not fail to yield a value.
   /// If an [Exception] or [Error] is thrown a left side [Either] is created with the [orElse] value.
-  factory Either.tryOrElse({R Function() provider, L orElse}) {
+  factory Either.tryOrElse({@required R Function() provider, @required L orElse}) {
     return Either<L, R>.tryOrElseProvide(provider: provider, orElse: (_) => orElse);
   }
 
   /// Creates a right sided [Either] if the [provider] does not fail to yield a value.
   /// In case of of an [Exception] a left sided [Either] is created with that [Exception]
   /// passed to the [onException] function.
-  factory Either.safeOnException({R Function() provider, L Function(Exception) onException}) {
+  factory Either.safeOnException({
+    @required R Function() provider,
+    @required L Function(Exception) onException,
+  }) {
     try {
       return Either<L, R>.right(provider());
     } on Exception catch (e) {
@@ -48,7 +51,10 @@ abstract class Either<L, R> {
   /// Creates a right sided [Either] if the [provider] does not fail to yield a value.
   /// In case of of an [Error] a left sided [Either] is created with that [Error]
   /// passed to the [onException] function.
-  factory Either.safeOnError({R Function() provider, L Function(Error) onError}) {
+  factory Either.safeOnError({
+    @required R Function() provider,
+    @required L Function(Error) onError,
+  }) {
     try {
       return Either<L, R>.right(provider());
     } on Error catch (e) {
@@ -164,7 +170,10 @@ abstract class Either<L, R> {
   /// Otherwise it returns a left sided [Either] with a value provided by the [orElse] function.
   /// If it is already left sided it returns self.
   @nonVirtual
-  Either<L, R> filterOrElseProvide({bool Function(R) predicate, L Function() orElse}) {
+  Either<L, R> filterOrElseProvide({
+    @required bool Function(R) predicate,
+    @required L Function() orElse,
+  }) {
     return isLeft || predicate(_get()) ? this : Either<L, R>.left(orElse());
   }
 
@@ -172,7 +181,10 @@ abstract class Either<L, R> {
   /// Otherwise it returns a left sided [Either] with a [orElse] value.
   /// If it is already left sided it returns self.
   @nonVirtual
-  Either<L, R> filterOrElse({bool Function(R) predicate, L orElse}) {
+  Either<L, R> filterOrElse({
+    @required bool Function(R) predicate,
+    @required L orElse,
+  }) {
     return filterOrElseProvide(predicate: predicate, orElse: () => orElse);
   }
 
@@ -180,7 +192,10 @@ abstract class Either<L, R> {
   /// Otherwise it returns a left sided [Either] with a value provided by the [orElse] function.
   /// If it is already left sided it returns self.
   @nonVirtual
-  Either<L, R> filterNotOrElseProvide({bool Function(R) predicate, L Function() orElse}) {
+  Either<L, R> filterNotOrElseProvide({
+    @required bool Function(R) predicate,
+    @required L Function() orElse,
+  }) {
     return filterOrElseProvide(predicate: (it) => !predicate(it), orElse: orElse);
   }
 
@@ -188,14 +203,20 @@ abstract class Either<L, R> {
   /// Otherwise it returns a left sided [Either] with a [orElse] value.
   /// If it is already left sided it returns self.
   @nonVirtual
-  Either<L, R> filterNotOrElse({bool Function(R) predicate, L orElse}) {
+  Either<L, R> filterNotOrElse({
+    @required bool Function(R) predicate,
+    @required L orElse,
+  }) {
     return filterNotOrElseProvide(predicate: predicate, orElse: () => orElse);
   }
 
   /// Returns a value from the [ifLeft] function or the [ifRight] function depending on the content
   /// of this [Either].
   @nonVirtual
-  U fold<U>({U Function(L) ifLeft, U Function(R) ifRight}) {
+  U fold<U>({
+    @required U Function(L) ifLeft,
+    @required U Function(R) ifRight,
+  }) {
     return isLeft ? ifLeft(_getLeft()) : ifRight(_get());
   }
 
@@ -240,7 +261,10 @@ abstract class Either<L, R> {
   /// Maps a value with the [ifLeft] function or the [ifRight] function depending on the content
   /// of this [Either].
   @nonVirtual
-  Either<L2, R2> bimap<L2, R2>({L2 Function(L) ifLeft, R2 Function(R) ifRight}) {
+  Either<L2, R2> bimap<L2, R2>({
+    @required L2 Function(L) ifLeft,
+    @required R2 Function(R) ifRight,
+  }) {
     if (isLeft) {
       return Either<L2, R2>.left(ifLeft(_getLeft()));
     } else {
@@ -286,7 +310,7 @@ abstract class Either<L, R> {
 
   /// Executes the [ifLeft] consumer or the [ifRight] consumer depending on the content of this [Either].
   @nonVirtual
-  void peek({Function(L) ifLeft, Function(R) ifRight}) {
+  void peek({@required Function(L) ifLeft, @required Function(R) ifRight}) {
     isLeft ? ifLeft(_getLeft()) : ifRight(_get());
   }
 
