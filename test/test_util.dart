@@ -1,4 +1,4 @@
-import 'package:bullseye/src/utils.dart';
+import 'package:missile/src/utils.dart';
 import 'package:test/test.dart';
 
 const isError = TypeMatcher<Error>();

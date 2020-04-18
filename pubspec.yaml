@@ -1,6 +1,6 @@
-name: bullseye
+name: missile
 description: Immutable and functional primitives for Dart.
-homepage: https://github.com/MiSikora/Bullseye
+homepage: https://github.com/MiSikora/missile
 version: 0.1.0
 
 environment:

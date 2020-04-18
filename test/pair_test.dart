@@ -1,4 +1,4 @@
-import 'package:bullseye/src/pair.dart';
+import 'package:missile/src/pair.dart';
 import 'package:test/test.dart';
 
 void main() {

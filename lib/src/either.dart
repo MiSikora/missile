@@ -1,5 +1,5 @@
-import 'package:bullseye/src/option.dart';
-import 'package:bullseye/src/utils.dart';
+import 'package:missile/src/option.dart';
+import 'package:missile/src/utils.dart';
 import 'package:meta/meta.dart';
 
 /// A container that represents one of two possible values. It is right biased.
