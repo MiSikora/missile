@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Version 0.2.0 *(2020-04-18)*
+----------------------------
+
+* Make `Pair` type public in the library.
+* Remove async mappers on `Option` and `Either` in favor of specialized `FutureO` and `FutureE` types.
+* Add nullability checks in method calls.
+
 Version 0.1.2 *(2020-04-18)*
 ----------------------------
 
