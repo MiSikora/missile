@@ -1,6 +1,6 @@
 // ignore: public_member_api_docs
-T requireNotNull<T>(T value, {String message = 'value cannot be null'}) {
-  if (value == null) throw ArgumentError.notNull(message);
+T requireNotNull<T>(T value, {String name = 'value'}) {
+  if (value == null) throw ArgumentError.notNull(name);
   return value;
 }
 

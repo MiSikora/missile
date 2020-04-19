@@ -22,6 +22,8 @@ abstract class Option<T> {
   /// Conditionally creates a new [Option]. If [predicate] yields `true`
   /// an [Option] with a non-null [value] is created. Otherwise empty [Option] is returned.
   factory Option.when({@required bool predicate, @required T value}) {
+    requireNotNull(predicate, name: 'predicate');
+    requireNotNull(value, name: 'value');
     return predicate ? Option.some(value) : Option<T>.none();
   }
 
@@ -46,6 +48,7 @@ abstract class Option<T> {
   /// });
   /// ```
   static Option<T> fx<T>(T Function(OptionFx) function) {
+    requireNotNull(function, name: 'function');
     try {
       return Option<T>.some(function(const OptionFx._instance()));
     } on _NoOptionValueException catch (_) {
@@ -80,6 +83,7 @@ abstract class Option<T> {
   /// });
   /// ```
   static Future<Option<T>> fxAsync<T>(Future<T> Function(OptionFx) function) async {
+    requireNotNull(function, name: 'function');
     try {
       return Option<T>.some(await function(const OptionFx._instance()));
     } on _NoOptionValueException catch (_) {
@@ -99,6 +103,7 @@ abstract class Option<T> {
   /// Returns a value held by this [Option] or returns a value provided by the [provider].
   @nonVirtual
   T getOrElseProvide(T Function() provider) {
+    requireNotNull(provider, name: 'provider');
     return isEmpty ? provider() : _get();
   }
 
@@ -109,61 +114,80 @@ abstract class Option<T> {
   /// Returns a value held by this [Option] or throws an [Exception] from the [provider].
   @nonVirtual
   T getOrException(Exception Function() provider) {
+    requireNotNull(provider, name: 'provider');
     return isEmpty ? throw provider() : _get();
   }
 
   /// Returns a value held by this [Option] or throws an [Error] from the [provider].
   @nonVirtual
   T getOrError(Error Function() provider) {
+    requireNotNull(provider, name: 'provider');
     return isEmpty ? throw provider() : _get();
   }
 
   /// Returns an [Option] provided by the [provider] if there is no value.
   @nonVirtual
   Option<T> orElseProvide(Option<T> Function() provider) {
+    requireNotNull(provider, name: 'provider');
     return isEmpty ? provider() : this;
   }
 
-  /// Returns the [other] if there is no value.
+  /// Returns the [orElse] if there is no value.
   @nonVirtual
-  Option<T> orElse(Option<T> other) => orElseProvide(() => other);
+  Option<T> orElse(Option<T> orElse) {
+    requireNotNull(orElse, name: 'orElse');
+    return orElseProvide(() => orElse);
+  }
 
   /// Returns an empty [Option] if the value does not match the [predicate].
   @nonVirtual
   Option<T> filter(bool Function(T) predicate) {
+    requireNotNull(predicate, name: 'predicate');
     return isEmpty || predicate(_get()) ? this : Option<T>.none();
   }
 
   /// Returns and empty [Option] if the value matches the [predicate].
   @nonVirtual
-  Option<T> filterNot(bool Function(T) predicate) => filter((it) => !predicate(it));
+  Option<T> filterNot(bool Function(T) predicate) {
+    requireNotNull(predicate, name: 'predicate');
+    return filter((it) => !predicate(it));
+  }
 
   /// Returns from the [ifNone] provider if there is no value or from the [ifSome] mapper
   /// if there is one.
   @nonVirtual
   R fold<R>({@required R Function() ifNone, @required R Function(T) ifSome}) {
+    requireNotNull(ifNone, name: 'ifNone');
+    requireNotNull(ifSome, name: 'ifSome');
     return map(ifSome).getOrElseProvide(ifNone);
   }
 
   /// Applies the [transformer] to this [Option].
   @nonVirtual
-  R transform<R>(R Function(Option<T>) transformer) => transformer(this);
+  R transform<R>(R Function(Option<T>) transformer) {
+    requireNotNull(transformer, name: 'transformer');
+    return transformer(this);
+  }
 
   /// Maps a value held by this [Option] if there is one.
   @nonVirtual
   Option<R> map<R>(R Function(T) mapper) {
+    requireNotNull(mapper, name: 'mapper');
     return isEmpty ? Option<R>.none() : Option.some(mapper(_get()));
   }
 
   /// Maps this [Option] to another one if currently there is a value being held.
   @nonVirtual
   Option<R> flatMap<R>(Option<R> Function(T) mapper) {
+    requireNotNull(mapper, name: 'mapper');
     return isEmpty ? Option<R>.none() : mapper(_get());
   }
 
   /// Executes the [ifNone] function if this [Option] is empty, otherwise it uses the [ifSome] consumer.
   @nonVirtual
   void peek({@required Function() ifNone, @required Function(T) ifSome}) {
+    requireNotNull(ifNone, name: 'ifNone');
+    requireNotNull(ifSome, name: 'ifSome');
     isEmpty ? ifNone() : ifSome(_get());
   }
 
@@ -171,11 +195,13 @@ abstract class Option<T> {
   /// [Either] is created with the [ifNone] value.
   @nonVirtual
   Either<L, T> toEither<L>(L ifNone) {
+    requireNotNull(ifNone, name: 'ifNone');
     return isEmpty ? Either<L, T>.left(ifNone) : Either<L, T>.right(_get());
   }
 
   /// Binds value of this [Option]. If no value is present [effects] control flow is interrupted.
   T bind(OptionFx effects) {
+    requireNotNull(effects, name: 'effects');
     return effects._bind(this);
   }
 }
@@ -231,6 +257,7 @@ class OptionFx {
 
   @nonVirtual
   T _bind<T>(Option<T> option) {
+    requireNotNull(option, name: 'option');
     return option.getOrException(() => const _NoOptionValueException());
   }
 }
