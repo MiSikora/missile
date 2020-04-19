@@ -68,3 +68,9 @@ class FutureO<T> implements Future<Option<T>> {
     return _delegate.whenComplete(action);
   }
 }
+
+// ignore: public_member_api_docs
+extension FutureOptions<T> on Future<Option<T>> {
+  /// Creates a [FutureO] from this [future].
+  FutureO<T> toFutureO() => FutureO<T>(this);
+}

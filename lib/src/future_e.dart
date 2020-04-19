@@ -95,3 +95,9 @@ class FutureE<L, R> implements Future<Either<L, R>> {
     return _delegate.whenComplete(action);
   }
 }
+
+// ignore: public_member_api_docs
+extension FutureEithers<L, R> on Future<Either<L, R>> {
+  /// Creates a [FutureE] from this [future].
+  FutureE<L, R> toFutureE() => FutureE<L, R>(this);
+}
