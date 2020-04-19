@@ -1,7 +1,12 @@
 Change Log
 ==========
 
-Version 0.2.0 *(2020-04-18)*
+Version 0.2.1 *(2020-04-19)*
+----------------------------
+
+* Make `FutureO` and `FutureE` types public in the library.
+
+Version 0.2.0 *(2020-04-19)*
 ----------------------------
 
 * Make `Pair` type public in the library.
