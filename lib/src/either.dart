@@ -19,6 +19,8 @@ abstract class Either<L, R> {
     @required R Function() provider,
     @required L Function(Either<Error, Exception>) orElse,
   }) {
+    requireNotNull(provider, name: 'provider');
+    requireNotNull(orElse, name: 'orElse');
     try {
       return Either<L, R>.right(provider());
     } on Exception catch (exception) {
@@ -31,6 +33,8 @@ abstract class Either<L, R> {
   /// Creates a right sided [Either] if the [provider] does not fail to yield a value.
   /// If an [Exception] or [Error] is thrown a left side [Either] is created with the [orElse] value.
   factory Either.tryOrElse({@required R Function() provider, @required L orElse}) {
+    requireNotNull(provider, name: 'provider');
+    requireNotNull(orElse, name: 'orElse');
     return Either<L, R>.tryOrElseProvide(provider: provider, orElse: (_) => orElse);
   }
 
@@ -41,6 +45,8 @@ abstract class Either<L, R> {
     @required R Function() provider,
     @required L Function(Exception) onException,
   }) {
+    requireNotNull(provider, name: 'provider');
+    requireNotNull(onException, name: 'onException');
     try {
       return Either<L, R>.right(provider());
     } on Exception catch (e) {
@@ -55,6 +61,8 @@ abstract class Either<L, R> {
     @required R Function() provider,
     @required L Function(Error) onError,
   }) {
+    requireNotNull(provider, name: 'provider');
+    requireNotNull(onError, name: 'onError');
     try {
       return Either<L, R>.right(provider());
     } on Error catch (e) {
@@ -83,6 +91,7 @@ abstract class Either<L, R> {
   /// });
   /// ```
   static Either<L, R> fx<L, R>(R Function(EitherFx<L>) function) {
+    requireNotNull(function, name: 'function');
     try {
       return Either<L, R>.right(function(EitherFx<L>._instance()));
     } on _NoRightValueException catch (e) {
@@ -117,6 +126,7 @@ abstract class Either<L, R> {
   /// });
   /// ```
   static Future<Either<L, R>> fxAsync<L, R>(Future<R> Function(EitherFx<L>) function) async {
+    requireNotNull(function, name: 'function');
     try {
       return Either<L, R>.right(await function(EitherFx<L>._instance()));
     } on _NoRightValueException catch (e) {
@@ -137,6 +147,7 @@ abstract class Either<L, R> {
   /// Returns a right value held by this [Either] or returns a value provided by the [provider].
   @nonVirtual
   R getOrElseProvide(R Function() provider) {
+    requireNotNull(provider, name: 'provider');
     return isLeft ? provider() : _get();
   }
 
@@ -147,24 +158,30 @@ abstract class Either<L, R> {
   /// Returns a right value held by this [Either] or throws an [Exception] from the [provider].
   @nonVirtual
   R getOrException(Exception Function() provider) {
+    requireNotNull(provider, name: 'provider');
     return isLeft ? throw provider() : _get();
   }
 
   /// Returns a right value held by this [Either] or throws an [Error] from the [provider].
   @nonVirtual
   R getOrError(Error Function() provider) {
+    requireNotNull(provider, name: 'provider');
     return isLeft ? throw provider() : _get();
   }
 
   /// Returns an [Error] provided by the [provider] if there is no right value.
   @nonVirtual
   Either<L, R> orElseProvide(Either<L, R> Function() provider) {
+    requireNotNull(provider, name: 'provider');
     return isLeft ? provider() : this;
   }
 
   /// Returns the [other] if there is no right  value.
   @nonVirtual
-  Either<L, R> orElse(Either<L, R> other) => orElseProvide(() => other);
+  Either<L, R> orElse(Either<L, R> orElse) {
+    requireNotNull(orElse, name: 'orElse');
+    return orElseProvide(() => orElse);
+  }
 
   /// Returns a right sided [Either] if the right value matches the [predicate].
   /// Otherwise it returns a left sided [Either] with a value provided by the [orElse] function.
@@ -174,6 +191,8 @@ abstract class Either<L, R> {
     @required bool Function(R) predicate,
     @required L Function() orElse,
   }) {
+    requireNotNull(predicate, name: 'predicate');
+    requireNotNull(orElse, name: 'orElse');
     return isLeft || predicate(_get()) ? this : Either<L, R>.left(orElse());
   }
 
@@ -185,6 +204,7 @@ abstract class Either<L, R> {
     @required bool Function(R) predicate,
     @required L orElse,
   }) {
+    requireNotNull(predicate, name: 'predicate');
     return filterOrElseProvide(predicate: predicate, orElse: () => orElse);
   }
 
@@ -196,6 +216,8 @@ abstract class Either<L, R> {
     @required bool Function(R) predicate,
     @required L Function() orElse,
   }) {
+    requireNotNull(predicate, name: 'predicate');
+    requireNotNull(orElse, name: 'orElse');
     return filterOrElseProvide(predicate: (it) => !predicate(it), orElse: orElse);
   }
 
@@ -207,6 +229,7 @@ abstract class Either<L, R> {
     @required bool Function(R) predicate,
     @required L orElse,
   }) {
+    requireNotNull(predicate, name: 'predicate');
     return filterNotOrElseProvide(predicate: predicate, orElse: () => orElse);
   }
 
@@ -217,6 +240,8 @@ abstract class Either<L, R> {
     @required U Function(L) ifLeft,
     @required U Function(R) ifRight,
   }) {
+    requireNotNull(ifLeft, name: 'ifLeft');
+    requireNotNull(ifRight, name: 'ifRight');
     return isLeft ? ifLeft(_getLeft()) : ifRight(_get());
   }
 
@@ -234,6 +259,7 @@ abstract class Either<L, R> {
   /// Otherwise it returns self.
   @nonVirtual
   Either<L, R> recover(R Function(L) mapper) {
+    requireNotNull(mapper, name: 'mapper');
     return isLeft ? Either<L, R>.right(mapper(_getLeft())) : this;
   }
 
@@ -241,6 +267,7 @@ abstract class Either<L, R> {
   /// Otherwise it returns self.
   @nonVirtual
   Either<L, R> flatRecover(Either<L, R> Function(L) mapper) {
+    requireNotNull(mapper, name: 'mapper');
     return isLeft ? mapper(_getLeft()) : this;
   }
 
@@ -251,6 +278,8 @@ abstract class Either<L, R> {
     @required L2 Function(L) ifLeft,
     @required R2 Function(R) ifRight,
   }) {
+    requireNotNull(ifLeft, name: 'ifLeft');
+    requireNotNull(ifRight, name: 'ifRight');
     if (isLeft) {
       return Either<L2, R2>.left(ifLeft(_getLeft()));
     } else {
@@ -261,30 +290,36 @@ abstract class Either<L, R> {
   /// Maps a left value held by this [Either] if there is one.
   @nonVirtual
   Either<U, R> mapLeft<U>(U Function(L) mapper) {
+    requireNotNull(mapper, name: 'mapper');
     return isLeft ? Either<U, R>.left(mapper(_getLeft())) : this;
   }
 
   /// Maps this [Either] to another one if it is left sided.
   @nonVirtual
   Either<U, R> flatMapLeft<U>(Either<U, R> Function(L) mapper) {
+    requireNotNull(mapper, name: 'mapper');
     return isLeft ? mapper(_getLeft()) : this;
   }
 
   /// Maps a right value held by this [Either] if there is one.
   @nonVirtual
   Either<L, U> map<U>(U Function(R) mapper) {
+    requireNotNull(mapper, name: 'mapper');
     return isLeft ? this : Either<L, U>.right(mapper(_get()));
   }
 
   /// Maps this [Either] to another one if it is right sided.
   @nonVirtual
   Either<L, U> flatMap<U>(Either<L, U> Function(R) mapper) {
+    requireNotNull(mapper, name: 'mapper');
     return isLeft ? this : mapper(_get());
   }
 
   /// Executes the [ifLeft] consumer or the [ifRight] consumer depending on the content of this [Either].
   @nonVirtual
   void peek({@required Function(L) ifLeft, @required Function(R) ifRight}) {
+    requireNotNull(ifLeft, name: 'ifLeft');
+    requireNotNull(ifRight, name: 'ifRight');
     isLeft ? ifLeft(_getLeft()) : ifRight(_get());
   }
 
@@ -297,6 +332,7 @@ abstract class Either<L, R> {
 
   /// Binds a right value of this [Either]. If no right value is present [effects] control flow is interrupted.
   R bind(EitherFx effects) {
+    requireNotNull(effects, name: 'effects');
     return effects._bind(this);
   }
 }
@@ -358,6 +394,7 @@ class EitherFx<L> {
 
   @nonVirtual
   R _bind<R>(Either<L, R> either) {
+    requireNotNull(either, name: 'either');
     return either.fold(
       ifLeft: (left) => throw _NoRightValueException(left),
       ifRight: (right) => right,
