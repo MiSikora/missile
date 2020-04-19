@@ -220,20 +220,6 @@ void main() {
       expect(mappedOption, Option.some(2));
     });
 
-    test('can be async mapped', () {
-      expect(
-        option.mapAsync((it) async => it + 1),
-        completion(Option.some(2)),
-      );
-    });
-
-    test('can be async flat mapped', () {
-      expect(
-        option.flatMapAsync((it) async => Option.some(it + 1)),
-        completion(Option.some(2)),
-      );
-    });
-
     test('uses some peek consumer', () {
       var value = '';
       option.peek(ifNone: () => throw Error(), ifSome: (it) => value = '$it');
@@ -300,20 +286,6 @@ void main() {
     test('cannot be mapped', () {
       final mappedOption = option.map((it) => it + 1);
       expect(mappedOption, const Option.none());
-    });
-
-    test('cannot be async mapped', () {
-      expect(
-        option.mapAsync((it) async => it + 1),
-        completion(const Option.none()),
-      );
-    });
-
-    test('cannot be async flat mapped', () {
-      expect(
-        option.flatMapAsync((it) async => Option.some(it + 1)),
-        completion(const Option.none()),
-      );
     });
 
     test('uses none peek consumer', () {
