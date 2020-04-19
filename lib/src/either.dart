@@ -237,24 +237,10 @@ abstract class Either<L, R> {
     return isLeft ? Either<L, R>.right(mapper(_getLeft())) : this;
   }
 
-  /// Executes the [mapper] and wraps the result in an [Either] if this [Either] is left sided.
-  /// Otherwise it returns self.
-  @nonVirtual
-  Future<Either<L, R>> recoverAsync(Future<R> Function(L) mapper) async {
-    return isLeft ? Either<L, R>.right(await mapper(_getLeft())) : this;
-  }
-
   /// Executes the [mapper] if this [Either] is left sided.
   /// Otherwise it returns self.
   @nonVirtual
   Either<L, R> flatRecover(Either<L, R> Function(L) mapper) {
-    return isLeft ? mapper(_getLeft()) : this;
-  }
-
-  /// Executes the [mapper] if this [Either] is left sided.
-  /// Otherwise it returns self.
-  @nonVirtual
-  Future<Either<L, R>> flatRecoverAsync(Future<Either<L, R>> Function(L) mapper) async {
     return isLeft ? mapper(_getLeft()) : this;
   }
 
@@ -290,21 +276,9 @@ abstract class Either<L, R> {
     return isLeft ? this : Either<L, U>.right(mapper(_get()));
   }
 
-  /// Maps a right value held by this [Either] if there is one.
-  @nonVirtual
-  Future<Either<L, U>> mapAsync<U>(Future<U> Function(R) mapper) async {
-    return isLeft ? this : Either<L, U>.right(await mapper(_get()));
-  }
-
   /// Maps this [Either] to another one if it is right sided.
   @nonVirtual
   Either<L, U> flatMap<U>(Either<L, U> Function(R) mapper) {
-    return isLeft ? this : mapper(_get());
-  }
-
-  /// Maps this [Either] to another one if it is right sided.
-  @nonVirtual
-  Future<Either<L, U>> flatMapAsync<U>(Future<Either<L, U>> Function(R) mapper) async {
     return isLeft ? this : mapper(_get());
   }
 
