@@ -1,4 +1,5 @@
 import 'package:missile/src/either.dart';
+import 'package:missile/src/future_o.dart';
 import 'package:missile/src/utils.dart';
 import 'package:meta/meta.dart';
 
@@ -82,13 +83,15 @@ abstract class Option<T> {
   ///   return one + two + three;
   /// });
   /// ```
-  static Future<Option<T>> fxAsync<T>(Future<T> Function(OptionFx) function) async {
+  static FutureO<T> fxAsync<T>(Future<T> Function(OptionFx) function) {
     requireNotNull(function, name: 'function');
-    try {
-      return Option<T>.some(await function(const OptionFx._instance()));
-    } on _NoOptionValueException catch (_) {
-      return Option<T>.none();
-    }
+    return FutureO<T>.provide(() async {
+      try {
+        return Option<T>.some(await function(const OptionFx._instance()));
+      } on _NoOptionValueException catch (_) {
+        return Option<T>.none();
+      }
+    });
   }
 
   T _get();
@@ -204,6 +207,9 @@ abstract class Option<T> {
     requireNotNull(effects, name: 'effects');
     return effects._bind(this);
   }
+
+  /// Converts this [Option] to an async container [FutureO].
+  FutureO<T> toFutureO() => FutureO<T>(Future.value(this));
 }
 
 @immutable
