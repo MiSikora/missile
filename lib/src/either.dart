@@ -1,3 +1,4 @@
+import 'package:missile/src/future_e.dart';
 import 'package:missile/src/option.dart';
 import 'package:missile/src/utils.dart';
 import 'package:meta/meta.dart';
@@ -125,13 +126,15 @@ abstract class Either<L, R> {
   ///   return one + two + three;
   /// });
   /// ```
-  static Future<Either<L, R>> fxAsync<L, R>(Future<R> Function(EitherFx<L>) function) async {
+  static FutureE<L, R> fxAsync<L, R>(Future<R> Function(EitherFx<L>) function) {
     requireNotNull(function, name: 'function');
-    try {
-      return Either<L, R>.right(await function(EitherFx<L>._instance()));
-    } on _NoRightValueException catch (e) {
-      return Either<L, R>.left(e.left);
-    }
+    return FutureE<L, R>.provide(() async {
+      try {
+        return Either<L, R>.right(await function(EitherFx<L>._instance()));
+      } on _NoRightValueException catch (e) {
+        return Either<L, R>.left(e.left);
+      }
+    });
   }
 
   R _get();
@@ -335,6 +338,9 @@ abstract class Either<L, R> {
     requireNotNull(effects, name: 'effects');
     return effects._bind(this);
   }
+
+  /// Converts this [Either] to an async container [FutureE].
+  FutureE<L, R> toFutureE() => FutureE<L, R>(Future.value(this));
 }
 
 @immutable
