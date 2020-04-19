@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Version 0.2.2 *(2020-04-19)*
+----------------------------
+
+* Add extensions to `Future` to convert it to `FutureO` or `FutureE`.
+
 Version 0.2.1 *(2020-04-19)*
 ----------------------------
 
