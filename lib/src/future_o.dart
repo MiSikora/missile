@@ -5,6 +5,7 @@ import 'package:missile/missile.dart';
 import 'package:missile/src/utils.dart';
 
 /// A specialized version of a [Future] that contains an [Option].
+@immutable
 class FutureO<T> implements Future<Option<T>> {
   final Future<Option<T>> _delegate;
 
