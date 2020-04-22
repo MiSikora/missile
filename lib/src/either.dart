@@ -57,7 +57,7 @@ abstract class Either<L, R> {
 
   /// Creates a right sided [Either] if the [provider] does not fail to yield a value.
   /// In case of of an [Error] a left sided [Either] is created with that [Error]
-  /// passed to the [onException] function.
+  /// passed to the [onError] function.
   factory Either.safeOnError({
     @required R Function() provider,
     @required L Function(Error) onError,

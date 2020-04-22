@@ -71,6 +71,6 @@ class FutureO<T> implements Future<Option<T>> {
 
 // ignore: public_member_api_docs
 extension FutureOptions<T> on Future<Option<T>> {
-  /// Creates a [FutureO] from this [future].
+  /// Creates a [FutureO] from this [Future].
   FutureO<T> toFutureO() => FutureO<T>(this);
 }
